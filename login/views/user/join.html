@@ -1,0 +1,40 @@
+join.html <br/>
+
+회원가입 PAGE <br/>
+
+<form method = "post" action = "/user/join_success">
+    <table>
+        <tr>
+            <td>아이디</td>
+            <td>
+                <input type ="text" name ="userid" >
+            </td>
+        </tr>
+        <tr>
+            <td>비번</td>
+            <td>
+                <input type ="text" name ="userpw" >
+            </td>
+        </tr>
+        <tr>
+            <td>이름</td>
+            <td>
+                <input type ="text" name ="username" >
+            </td>
+        </tr>
+        <tr>
+            <td>주민등록번호</td>
+            <td>
+                <input type ="text" name ="userrrn">
+            </td>
+        </tr>
+        <tr>
+            <td>성별</td>
+            <td>
+                <input type ="radio" name ="gender" value="0" checked >남자
+                <input type ="radio" name ="gender" value="1" >여자
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="회원가입하기">
+</form>
