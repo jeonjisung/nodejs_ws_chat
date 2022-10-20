@@ -1,4 +1,3 @@
-{% if isLogin %}
 <!DOCTYPE html>
 <html>
 
@@ -20,55 +19,18 @@
             background-color: white;
         }
     </style>
-    <script>
-        const ws = new WebSocket("ws://localhost:3000")
-
-        function nickname_change() {
-            var result = prompt("닉네임을 입력하세요.");
-
-            if (result != null) {
-                document.getElementById("nickname").value = result;
-
-                const name = document.getElementById("nickname").value
-            }
-        }
-
-        function clearMessage() {
-            document.getElementById("message").value = ""
-        }
-
-        function sendMessage() {
-            const nickname = document.getElementById("nickname").value
-            const message = document.getElementById("message").value
-            const fullMessage = `[${nickname}] ${message}`
-
-            ws.send(fullMessage)
-            clearMessage()
-        }
-
-        function receiveMessage(event) {
-            const chat = document.createElement("div")
-            const message = document.createTextNode(event.data)
-            chat.appendChild(message)
-
-            const chatLog = document.getElementById("chat-log")
-            chatLog.appendChild(chat)
-        }
-
-        ws.onmessage = receiveMessage
-
-        $("#exampleTable").DataTable({ });
-    </script>
 </head>
 
+
+
+{% if isLogin %}
 <body>
     <h1>Chat</h1>
     <div id="screen1">
-        <button onclick="nickname_change()">닉네임 설정</button>
         {{userid}}님 환영합니다.
         <div>
             <a href="/user/logout"> 로그아웃 </a><br />
-            <input type="text" id="nickname" style="width: 100px" readonly />
+            <input type="text" id="userid" style="width: 100px" value="{{userid}}" readonly/>
             <input type="text" id="message" placeholder="메시지" style="width: 200px" />
             <button onClick="sendMessage()">전송</button>
         </div>
@@ -85,3 +47,42 @@
 <a href="/user/join">회원가입</a>
 
 {% endif %}
+
+<script>
+    const ws = new WebSocket("ws://localhost:3000")
+    
+    var userid = document.getElementById("userid").value
+    var usermessage = document.getElementById("message").value
+
+    function clearMessage() {
+        document.getElementById("message").value = ""
+    }
+
+    function sendMessage() {
+        const username = document.getElementById("userid").value
+        const message = document.getElementById("message").value
+        const fullMessage = `[${username}] ${usermessage}`
+
+        var send_data_obj = new Object();
+
+        send_data_obj.username = username;
+        send_data_obj.message = message;
+        
+        var send_data_str = JSON.stringify(send_data_obj);
+        console.log(send_data_str);
+        ws.send(send_data_str)
+        clearMessage()
+    }
+
+    function receiveMessage(event) {
+        const chat = document.createElement("div")
+        const message = document.createTextNode(event.data)
+        chat.appendChild(message)
+
+        const chatLog = document.getElementById("chat-log")
+        chatLog.appendChild(chat)
+    }
+
+    ws.onmessage = receiveMessage
+
+</script>

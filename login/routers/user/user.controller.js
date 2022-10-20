@@ -1,10 +1,10 @@
-const {User} = require('../../models')
+const { User } = require('../../models')
 
-let join = (req,res)=>{
+let join = (req, res) => {
     res.render('./user/join.html');
 }
 
-let join_success = async(req,res)=>{
+let join_success = async (req, res) => {
     let userid = req.body.userid
     let userpw = req.body.userpw;
     let username = req.body.username;
@@ -12,44 +12,50 @@ let join_success = async(req,res)=>{
     let gender = req.body.gender;
 
     await User.create({
-        userid,userpw,username, userrrn, gender
+        userid, userpw, username, userrrn, gender
     })
 
-    res.render('./user/join_success.html',{
+    res.render('./user/join_success.html', {
         userid, userpw, username, userrrn, gender
     });
 }
 
-let login = (req,res)=>{
+let login = (req, res) => {
     res.render('./user/login.html');
 }
 
-let login_check = async (req,res)=>{
+let login_check = async (req, res) => {
     let userid = req.body.userid;
     let userpw = req.body.userpw;
 
     let result = await User.findOne({
-        where:{userid, userpw}
+        where: { userid, userpw }
     })
 
-    req.session.uid = userid;
-    req.session.isLogin = true;
+    console.log(result)
 
-    req.session.save(()=>{
-        res.redirect('/user/join_success.html');
-    })
+    if (result == null) {
+        res.redirect('./user/login.html')
+    } else {
+        req.session.uid = userid;
+        req.session.isLogin = true;
+
+        req.session.save(() => {
+            res.redirect('/user/join_success.html');
+        })
+    }
 }
 
-let logout = (req,res)=>{
+let logout = (req, res) => {
     delete req.session.isLogin;
     delete req.session.uid;
 
-    req.session.save(()=>{
+    req.session.save(() => {
         res.redirect('/');
     })
 }
 
-let info = async (req,res)=>{
+let info = async (req, res) => {
     let result = await User.findAll({});
 
     res.render('./user/info.html', {
@@ -58,6 +64,6 @@ let info = async (req,res)=>{
     console.log(result);
 }
 
-module.exports ={
+module.exports = {
     join, join_success, login, login_check, logout, info
 }

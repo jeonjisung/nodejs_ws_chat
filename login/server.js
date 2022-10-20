@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const {sequelize}=require('./models')
+const { sequelize } = require('./models')
 
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser')
@@ -19,27 +19,27 @@ const conn = {
 }
 
 app.use(session({
-    secret:'aaa',
-    resave:false,
-    saveUninitialized:true,
+    secret: 'aaa',
+    resave: false,
+    saveUninitialized: true,
 }))
 
-app.use(bodyParser.urlencoded({extended:false}));
-nunjucks.configure('views',{
-    express:app,
+app.use(bodyParser.urlencoded({ extended: false }));
+nunjucks.configure('views', {
+    express: app,
 })
 app.set('view engine', 'html')
 
-sequelize.sync({force:false})
-.then(()=>{
-    console.log('접속 성공')
-}).catch(()=>{
-    console.log('접속 실패')
-})
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('접속 성공')
+    }).catch(() => {
+        console.log('접속 실패')
+    })
 
-app.use('/',routers);
+app.use('/', routers);
 
-const HTTPServer = app.listen(3000,()=>{
+const HTTPServer = app.listen(3000, () => {
     console.log('server start port : 3000')
 });
 
@@ -55,18 +55,12 @@ wss.on("connection", (ws, request) => {
     connection.connect();
 
     ws.on("message", data => {
-
         wss.clients.forEach(client => {
-            client.send(data.toString())
-            let sql = `INSERT INTO chat(DATE, USERID, MESSAGE) VALUES (NOW(), '${req.body.userid}','${data.toString()}');`
+            var recv_data_obj = JSON.parse(data);
 
-            connection.query(sql, function (err, results, fields) {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(results);
-            });
-            sql = "SELECT * FROM chat";
+            client.send(recv_data_obj.message)
+
+            let sql = `INSERT INTO chat(DATE, USERID, MESSAGE) VALUES (NOW(), '${recv_data_obj.username}','${recv_data_obj.message}');`
 
             connection.query(sql, function (err, results, fields) {
                 if (err) {
