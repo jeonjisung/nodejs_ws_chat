@@ -1,6 +1,6 @@
 let main = (req,res)=>{
     console.log(req.session);
-    res.render('index.html',{
+    res.render('index.ejs',{
         userid:req.session.uid,
         isLogin:req.session.isLogin
     });
