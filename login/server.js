@@ -7,10 +7,10 @@ const bodyParser = require('body-parser')
 const routers = require('./routers')
 const session = require('express-session')
 
-const fs = require('fs');
-const ejs = require('ejs');
 const wsModule = require('ws');
 const mysql = require('mysql');
+
+app.use('/', routers);
 
 const connection = mysql.createConnection({
     host: '127.0.0.1',
@@ -36,6 +36,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 nunjucks.configure('views', {
     express: app,
 })
+
 app.set('view engine', 'ejs')
 
 sequelize.sync({ force: false })
@@ -45,24 +46,22 @@ sequelize.sync({ force: false })
         console.log('접속 실패')
     })
 
-app.use('/', routers);
-
-// view/index.ejs data 전송
-const mainPage = fs.readFileSync('./views/index.ejs', 'utf-8')
-
 app.get('/', (req, res) => {
-    var page = ejs.render(mainPage, {});
-    res.send(page);
-});
-
-app.get('/getdata?', (req, res) => {
-    
-    connection.query("SELECT * FROM users;", function(err, result, fields){
-        if(err) throw err;
-        else{
-            var page = ejs.render(mainPage, {
+    client.query("SELECT * FROM users;", function (err, result, fields) {
+        if (err) throw err;
+        else {
+            res.render('index', {
                 data: result,
             });
+        }
+    });
+});
+
+app.get('/getdata', (req, res) => {
+
+    client.query("SELECT * FROM users;", function (err, result, fields) {
+        if (err) throw err;
+        else {
             res.send(page);
         }
     });
