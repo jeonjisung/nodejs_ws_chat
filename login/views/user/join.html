@@ -1,31 +1,31 @@
 join.html <br/>
 
 회원가입 PAGE <br/>
-
-<form method = "post" action = "/user/join_success">
+<form method = "post" id = "login_form" action = "/user/join_success" enctype ="multipart/form-data">
     <table>
         <tr>
             <td>아이디</td>
             <td>
-                <input type ="text" name ="userid" >
+                <input type ="text" id = "userid" name ="userid" >
+                <p id ="userid_msg"></p>
             </td>
         </tr>
         <tr>
-            <td>비번</td>
+            <td>패스워드</td>
             <td>
-                <input type ="text" name ="userpw" >
+                <input type ="password" name ="userpw" id ="userpw">
+            </td>
+        </tr>
+        <tr>
+            <td>패스워드 확인</td>
+            <td>
+                <input type ="password" name ="userpw_check" id="userpw_check" >
             </td>
         </tr>
         <tr>
             <td>이름</td>
             <td>
-                <input type ="text" name ="username" >
-            </td>
-        </tr>
-        <tr>
-            <td>주민등록번호</td>
-            <td>
-                <input type ="text" name ="userrrn">
+                <input type ="text" name ="username" maxlength="20">
             </td>
         </tr>
         <tr>
@@ -35,6 +35,61 @@ join.html <br/>
                 <input type ="radio" name ="gender" value="1" >여자
             </td>
         </tr>
+        <tr>
+            <td>주민등록번호</td>
+            <td>
+                <input type ="text" name ="userrrn">
+            </td>
+        </tr>
     </table>
-    <input type="submit" value="회원가입하기">
+    <input type="button" id = "login_submit" value="회원가입하기">
 </form>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script type ="text/javascript">
+    const pwd1 = document.querySelector('#userpw');
+    const pwd2 = document.querySelector('#userpw_check');
+    const btn = document.querySelector('#login_submit');
+    const login_form = document.querySelector('#login_form')
+    const userid_msg = document.querySelector('#userid_msg');
+    const userid = document.querySelector('#userid');
+
+    function password_check(){
+        console.log(pwd1.value, pwd2.value);
+        return pwd1.value == pwd2.value; 
+    }
+
+    async function userid_check(){
+        let data = await axios.get(`http://localhost:3000/user/userid_check?userid=${userid.value}`)   //요청 보내기 
+        console.log(data); 
+
+        //ajax를 통해 data를 가져왔다고 가정하자! 
+        // 중복이면 false, 중복아니면 true 값 !@ 
+        login_flag = data.data.login; // 중복되지 않았다를 기본 값 / ajax에서 받을거
+        if(userid.value==''){
+            userid_msg.innerHTML='아이디를 입력해주세요'
+        }else if (login_flag){
+            userid_msg.innerHTML='올바른 아이디입니다.'
+            userid_msg.style.color='green';
+        }else{
+            userid_msg.innerHTML='이미 해당 아이디가 있습니다.'
+            userid_msg.style.color='red';
+        }
+    }
+
+    userid.addEventListener('focusout',userid_check)
+    
+
+    btn.addEventListener('click', ()=>{
+        pwd_check = password_check(); 
+        // Pwd가 맞을 경우 true, 틀리면 false
+        if(pwd_check){
+            login_form.submit();   
+        }else{
+            pwd1.value = ''; 
+            pwd2.value = ''; 
+            pwd1.focus(); // 마우스 커서 이동 
+            alert('패스워드가 일치하지 않습니다.')
+        }
+    })
+
+</script>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="ko">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Chatting</title>
+    <style type="text/css">
+        #screen1 {
+            width: 50%;
+            height: 50%;
+            background-color: white;
+        }
+
+        #screen2 {
+            width: 50%;
+            height: 50%;
+            float: right;
+            background-color: white;
+        }
+    </style>
+</head>
+
+{% if isLogin %}
+
+<body>
+    <h1>Chat</h1>
+    <div id="screen1">
+            {{userid}}님 환영합니다. <br />
+            <a href="/user/logout">로그아웃 </a>
+            <a href="/user/info">회원 정보</a>
+            <div>
+                <input type="text" id="user_id" style="width: 100px" value="{{userid}}" readonly />
+                <input type="text" id="user_message" placeholder="메시지" style="width: 200px" />
+                <button onClick="sendMessage()">전송</button>
+            </div>
+            <div id="chat-log">
+            </div>
+    </div>
+    <div id="screen2">
+
+    </div>
+</body>
+
+</html>
+{% else %}
+
+<a href="/user/login">로그인</a>
+<a href="/user/join">회원가입</a>
+
+{% endif %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.css" />
+<script src="https://cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.js"></script>
+<script type="text/javascript">
+    const ws = new WebSocket("ws://localhost:3000")
+
+    function clearMessage() {
+        document.getElementById("user_message").value = ""
+    }
+
+    function sendMessage() {
+        const username = document.getElementById("user_id").value
+        const message = document.getElementById("user_message").value
+
+        var send_data_obj = new Object();
+
+        send_data_obj.username = username;
+        send_data_obj.message = message;
+
+        var send_data_str = JSON.stringify(send_data_obj);
+        console.log(send_data_str);
+        ws.send(send_data_str)
+        clearMessage()
+    }
+
+    function receiveMessage(event) {
+        const chat = document.createElement("div")
+        const message = document.createTextNode(event.data)
+        chat.appendChild(message)
+
+        const chatLog = document.getElementById("chat-log")
+        chatLog.appendChild(chat)
+    }
+
+    ws.onmessage = receiveMessage
+</script>
