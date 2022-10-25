@@ -78,10 +78,9 @@ wss.on("connection", (ws, request) => {
                 console.log(err);
             } else {
                 for(var i = rows.length - 10; i < rows.length; i++){
-                    console.log("[" + rows[i].USERID + "] " + rows[i].MESSAGE);
                     client.send("[" + rows[i].USERID + "] " + rows[i].MESSAGE);
                 }
-                client.send("-------------=CURRENT MESSAGE--------------")   
+                client.send("--------------CURRENT MESSAGE--------------")   
                 client.send(`새로운 유저가 접속했습니다. 현재 유저 ${wss.clients.size} 명`);
             }
         });
@@ -93,5 +92,29 @@ wss.on("connection", (ws, request) => {
         wss.clients.forEach((client) => {
             client.send(`유저 한명이 떠났습니다. 현재 유저 ${wss.clients.size} 명`);
         });
+    });
+});
+
+
+app.post('/', function (req, res) {
+    var responseData = {};
+
+    var query = connection.query('SELECT DATE_FORMAT(date, "%Y%m%d") AS date, count(*) AS cnt FROM chat GROUP BY DATE_FORMAT(date, "%Y%m%d") ORDER BY date DESC;', function (err, rows) {
+        responseData.chat = [];
+        responseData.date = [];
+        if (err) throw err;
+        if (rows[0]) {
+            responseData.result = "ok";
+            rows.forEach(function (val) {
+                responseData.chat.push(val.cnt);
+                responseData.date.push(val.date);
+            })
+        }
+        else {
+            responseData.result = "none";
+            responseData.chat = "";
+            responseData.date = "";
+        }
+        res.json(responseData);
     });
 });
