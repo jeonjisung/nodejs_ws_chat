@@ -95,26 +95,3 @@ wss.on("connection", (ws, request) => {
     });
 });
 
-
-app.post('/', function (req, res) {
-    var responseData = {};
-
-    var query = connection.query('SELECT DATE_FORMAT(date, "%Y%m%d") AS date, count(*) AS cnt FROM chat GROUP BY DATE_FORMAT(date, "%Y%m%d") ORDER BY date DESC;', function (err, rows) {
-        responseData.chat = [];
-        responseData.date = [];
-        if (err) throw err;
-        if (rows[0]) {
-            responseData.result = "ok";
-            rows.forEach(function (val) {
-                responseData.chat.push(val.cnt);
-                responseData.date.push(val.date);
-            })
-        }
-        else {
-            responseData.result = "none";
-            responseData.chat = "";
-            responseData.date = "";
-        }
-        res.json(responseData);
-    });
-});
